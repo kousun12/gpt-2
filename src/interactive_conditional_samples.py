@@ -8,14 +8,15 @@ import tensorflow as tf
 
 import model, sample, encoder
 
+
 def interact_model(
-    model_name='117M',
-    seed=None,
-    nsamples=1,
-    batch_size=1,
-    length=None,
-    temperature=1,
-    top_k=0,
+        model_name='117M',
+        seed=None,
+        nsamples=1,
+        batch_size=1,
+        length=None,
+        temperature=1,
+        top_k=0,
 ):
     """
     Interactively run the model
@@ -82,6 +83,6 @@ def interact_model(
                     print(text)
             print("=" * 80)
 
+
 if __name__ == '__main__':
     fire.Fire(interact_model)
-

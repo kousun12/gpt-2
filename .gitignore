@@ -7,4 +7,6 @@ samples
 .idea/gpt-2.iml
 .idea/misc.xml
 .idea/workspace.xml
+.idea/inspectionProfiles/
+.DS_Store
 venv
