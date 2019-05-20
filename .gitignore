@@ -2,5 +2,9 @@ __pycache__
 models/
 checkpoint
 samples
-*/workspace.xml
+
 .idea/workspace.xml
+.idea/gpt-2.iml
+.idea/misc.xml
+.idea/workspace.xml
+venv
