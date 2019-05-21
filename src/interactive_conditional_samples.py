@@ -17,6 +17,7 @@ def interact_model(
         length=None,
         temperature=1,
         top_k=0,
+        tune_name='',
 ):
     """
     Interactively run the model
@@ -62,7 +63,7 @@ def interact_model(
         )
 
         saver = tf.train.Saver()
-        ckpt = tf.train.latest_checkpoint(os.path.join('models', model_name))
+        ckpt = tf.train.latest_checkpoint(os.path.join('models', model_name, tune_name))
         saver.restore(sess, ckpt)
 
         while True:
