@@ -10,7 +10,7 @@ import model, sample, encoder
 
 
 def interact_model(
-        model_name='117M',
+        model_name='345M',
         seed=None,
         nsamples=1,
         batch_size=1,
@@ -67,13 +67,13 @@ def interact_model(
         saver.restore(sess, ckpt)
 
         while True:
-            raw_text = input("Model prompt >>> ").replace("\\n", "\n")
+            raw_text = input("title >>>")
+            # raw_text = raw_text.replace("\\n", "\n")
             while not raw_text:
-                print('Prompt should not be empty!')
-                raw_text = input("Model prompt >>> ")
-            import pdb;
-            pdb.set_trace()
-            context_tokens = enc.encode(raw_text)
+                print('can not be empty')
+                raw_text = input("title >>> ")
+            text_in = f'<|endoftext|>{raw_text}\n\n\n\n'
+            context_tokens = enc.encode(text_in)
             generated = 0
             for _ in range(nsamples // batch_size):
                 out = sess.run(output, feed_dict={
@@ -82,9 +82,8 @@ def interact_model(
                 for i in range(batch_size):
                     generated += 1
                     text = enc.decode(out[i])
-                    print("=" * 40 + " SAMPLE " + str(generated) + " " + "=" * 40)
-                    print(text)
-            print("=" * 80)
+                    # print("=" * 40 + " SAMPLE " + str(generated) + " " + "=" * 40)
+                    print(text.replace("<|endoftext|>", f"{'=' * 80}\n\n"))
 
 
 if __name__ == '__main__':
