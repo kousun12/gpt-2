@@ -109,11 +109,18 @@ class Encoder:
         return text
 
 
+XTRA_TOKENS = ['<|title|>']
+
+
 def get_encoder(model_name):
     with open(os.path.join('models', model_name, 'encoder.json'), 'r') as f:
         encoder = json.load(f)
     with open(os.path.join('models', model_name, 'vocab.bpe'), 'r', encoding="utf-8") as f:
         bpe_data = f.read()
+
+    max_tkn = max(encoder.values())
+    encoder.update({t: max_tkn + i for i, t in enumerate(XTRA_TOKENS, start=1)})
+
     bpe_merges = [tuple(merge_str.split()) for merge_str in bpe_data.split('\n')[1:-1]]
     return Encoder(
         encoder=encoder,

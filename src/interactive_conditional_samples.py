@@ -56,10 +56,12 @@ def interact_model(
         np.random.seed(seed)
         tf.set_random_seed(seed)
         output = sample.sample_sequence(
-            hparams=hparams, length=length,
+            hparams=hparams,
+            length=length,
             context=context,
             batch_size=batch_size,
-            temperature=temperature, top_k=top_k
+            temperature=temperature,
+            top_k=top_k
         )
 
         saver = tf.train.Saver()
@@ -67,7 +69,7 @@ def interact_model(
         saver.restore(sess, ckpt)
 
         while True:
-            raw_text = input("title >>>")
+            raw_text = input("title >>> ")
             # raw_text = raw_text.replace("\\n", "\n")
             while not raw_text:
                 print('can not be empty')
@@ -83,7 +85,7 @@ def interact_model(
                     generated += 1
                     text = enc.decode(out[i])
                     # print("=" * 40 + " SAMPLE " + str(generated) + " " + "=" * 40)
-                    print(text.replace("<|endoftext|>", f"{'=' * 80}\n\n"))
+                    print(f'\n\n{"=" * 80}\n\n{raw_text}\n\n\n\n' + text.replace("<|endoftext|>", f"{'=' * 80}\n\n"))
 
 
 if __name__ == '__main__':
