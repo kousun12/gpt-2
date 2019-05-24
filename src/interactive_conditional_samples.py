@@ -9,6 +9,10 @@ import tensorflow as tf
 import model, sample, encoder
 
 
+def title_fmt(title):
+    return f'<|endoftext|>\n<|title|>{title}<|title|>\n\n\n'
+
+
 def interact_model(
         model_name='345M',
         seed=None,
@@ -70,11 +74,10 @@ def interact_model(
 
         while True:
             raw_text = input("title >>> ")
-            # raw_text = raw_text.replace("\\n", "\n")
             while not raw_text:
                 print('can not be empty')
                 raw_text = input("title >>> ")
-            text_in = f'<|endoftext|>{raw_text}\n\n\n\n'
+            text_in = title_fmt(raw_text)
             context_tokens = enc.encode(text_in)
             generated = 0
             for _ in range(nsamples // batch_size):
@@ -84,7 +87,6 @@ def interact_model(
                 for i in range(batch_size):
                     generated += 1
                     text = enc.decode(out[i])
-                    # print("=" * 40 + " SAMPLE " + str(generated) + " " + "=" * 40)
                     print(f'\n\n{"=" * 80}\n\n{raw_text}\n\n\n\n' + text.replace("<|endoftext|>", f"{'=' * 80}\n\n"))
 
 
