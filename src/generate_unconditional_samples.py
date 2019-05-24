@@ -68,9 +68,8 @@ def sample_model(
             out = sess.run(output)
             for i in range(batch_size):
                 generated += batch_size
-                print("=" * 40 + " SAMPLE " + str(generated) + " " + "=" * 40)
                 text = enc.decode(out[i])
-                sf.print_output(text)
+                sf.print_output(text, sample=generated)
 
 
 if __name__ == '__main__':

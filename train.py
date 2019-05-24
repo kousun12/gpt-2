@@ -15,6 +15,7 @@ import model, sample, encoder
 from load_dataset import load_dataset, Sampler
 from accumulate import AccumulatingOptimizer
 import memory_saving_gradients
+import sample_utils as sf
 
 CHECKPOINT_DIR = 'checkpoint'
 SAMPLE_DIR = 'samples'
@@ -189,11 +190,11 @@ def main():
                     feed_dict={context: args.batch_size * [context_tokens]})
                 for i in range(min(args.sample_num - index, args.batch_size)):
                     text = enc.decode(out[i])
-                    text = '======== SAMPLE {} ========\n{}\n'.format(
-                        index + 1, text)
-                    all_text.append(text)
+                    c_out = sf.get_output(text, sample=index + 1)
+                    all_text.append(c_out)
+                    print(c_out)
                     index += 1
-            print(text)
+
             maketree(os.path.join(SAMPLE_DIR, args.run_name))
             with open(
                     os.path.join(SAMPLE_DIR, args.run_name,

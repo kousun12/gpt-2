@@ -77,10 +77,12 @@ def interact_model(
             text_in = sf.title_fmt(raw_text)
             context_tokens = enc.encode(text_in)
             generated = 0
-            for _ in range(nsamples // batch_size):
+            for s in range(nsamples // batch_size):
                 out = sess.run(output, feed_dict={
                     context: [context_tokens for _ in range(batch_size)]
                 })[:, len(context_tokens):]
+                if s > 0:
+                    sf.print_output('', sample=s + 1)
                 for i in range(batch_size):
                     generated += 1
                     text = enc.decode(out[i])
