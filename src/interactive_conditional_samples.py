@@ -13,6 +13,10 @@ def title_fmt(title):
     return f'<|endoftext|>\n<|title|>{title}<|title|>\n\n\n'
 
 
+def output_fmt(text):
+    return text.replace("<|endoftext|>", f"{'=' * 80}\n\n").replace("<|title|>", "")
+
+
 def interact_model(
         model_name='345M',
         seed=None,
@@ -87,7 +91,7 @@ def interact_model(
                 for i in range(batch_size):
                     generated += 1
                     text = enc.decode(out[i])
-                    print(f'\n\n{"=" * 80}\n\n{raw_text}\n\n\n\n' + text.replace("<|endoftext|>", f"{'=' * 80}\n\n"))
+                    print(f'\n\n{"=" * 80}\n\n{raw_text}\n\n\n\n' + output_fmt(text))
 
 
 if __name__ == '__main__':
