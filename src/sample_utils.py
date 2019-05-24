@@ -8,7 +8,7 @@ def output_fmt(text):
 
 def print_output(text, title=None):
     if title:
-        start = '{title}\n\n\n\n'
+        start = f'{title}\n\n\n\n'
     else:
         start = ''
 
