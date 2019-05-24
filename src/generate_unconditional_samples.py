@@ -7,6 +7,7 @@ import numpy as np
 import tensorflow as tf
 
 import model, sample, encoder
+import sample_utils as sf
 
 
 def sample_model(
@@ -67,9 +68,9 @@ def sample_model(
             out = sess.run(output)
             for i in range(batch_size):
                 generated += batch_size
-                text = enc.decode(out[i])
                 print("=" * 40 + " SAMPLE " + str(generated) + " " + "=" * 40)
-                print(text)
+                text = enc.decode(out[i])
+                sf.print_output(text)
 
 
 if __name__ == '__main__':

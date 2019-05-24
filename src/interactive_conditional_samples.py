@@ -7,14 +7,7 @@ import numpy as np
 import tensorflow as tf
 
 import model, sample, encoder
-
-
-def title_fmt(title):
-    return f'<|endoftext|>\n<|title|>{title}<|title|>\n\n\n'
-
-
-def output_fmt(text):
-    return text.replace("<|endoftext|>", f"{'=' * 80}\n\n").replace("<|title|>", "")
+import sample_utils as sf
 
 
 def interact_model(
@@ -81,7 +74,7 @@ def interact_model(
             while not raw_text:
                 print('can not be empty')
                 raw_text = input("title >>> ")
-            text_in = title_fmt(raw_text)
+            text_in = sf.title_fmt(raw_text)
             context_tokens = enc.encode(text_in)
             generated = 0
             for _ in range(nsamples // batch_size):
@@ -91,7 +84,7 @@ def interact_model(
                 for i in range(batch_size):
                     generated += 1
                     text = enc.decode(out[i])
-                    print(f'\n\n{"=" * 80}\n\n{raw_text}\n\n\n\n' + output_fmt(text))
+                    sf.print_output(text, raw_text)
 
 
 if __name__ == '__main__':
