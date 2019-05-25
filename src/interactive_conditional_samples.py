@@ -5,6 +5,8 @@ import json
 import os
 import numpy as np
 import tensorflow as tf
+import re
+import random
 
 import model, sample, encoder
 import sample_utils as sf
@@ -19,6 +21,7 @@ def interact_model(
         temperature=1,
         top_k=0,
         tune_name='',
+        trunc_first=False
 ):
     """
     Interactively run the model
@@ -37,6 +40,9 @@ def interact_model(
      considered for each step (token), resulting in deterministic completions,
      while 40 means 40 words are considered at each step. 0 (default) is a
      special setting meaning no restrictions. 40 generally is a good value.
+    :tune_name=None : String, subdir within the model_name dir where the fine tuned model lives,
+     defaults to None, i.e. the base model
+    :trunc_first=False : Boolean truncate each sample at the first end token
     """
     if batch_size is None:
         batch_size = 1
@@ -56,14 +62,6 @@ def interact_model(
         context = tf.placeholder(tf.int32, [batch_size, None])
         np.random.seed(seed)
         tf.set_random_seed(seed)
-        output = sample.sample_sequence(
-            hparams=hparams,
-            length=length,
-            context=context,
-            batch_size=batch_size,
-            temperature=temperature,
-            top_k=top_k
-        )
 
         saver = tf.train.Saver()
         ckpt = tf.train.latest_checkpoint(os.path.join('models', model_name, tune_name))
@@ -75,16 +73,54 @@ def interact_model(
                 print('can not be empty')
                 raw_text = input("title >>> ")
             text_in = sf.title_fmt(raw_text)
-            context_tokens = enc.encode(text_in)
-            generated = 0
-            for s in range(nsamples // batch_size):
-                out = sess.run(output, feed_dict={
-                    context: [context_tokens for _ in range(batch_size)]
-                })[:, len(context_tokens):]
-                for i in range(batch_size):
-                    generated += 1
-                    text = enc.decode(out[i])
-                    sf.print_output(text, raw_text, generated)
+            tokens_in = enc.encode(text_in)
+            gen(
+                hparams,
+                length,
+                context,
+                batch_size,
+                temperature,
+                top_k,
+                nsamples,
+                sess,
+                enc,
+                tokens_in,
+                raw_text,
+                trunc_first
+            )
+
+
+def _get_temp(temperature):
+    try:
+        return float(temperature)
+    except ValueError:
+        gauss = re.search(r'(?P<mu>\d*\.?\d*):(?P<sig>\d*\.?\d*)', str(temperature))
+        mu, sig = gauss.group('mu'), gauss.group('sig') if gauss else (None, None)
+        if mu and sig:
+            return random.gauss(mu, sig)
+        else:
+            return 1
+
+
+def gen(hparams, length, context, batch_size, temperature, top_k, nsamples, sess, enc, tokens_in, raw_in, trunc):
+    n_toks = len(tokens_in)
+    generated = 0
+    for _ in range(nsamples // batch_size):
+        temp = _get_temp(temperature)
+        output = sample.sample_sequence(
+            hparams=hparams,
+            length=length,
+            context=context,
+            batch_size=batch_size,
+            temperature=temp,
+            top_k=top_k
+        )
+        batches = range(batch_size)
+        out = sess.run(output, feed_dict={context: [tokens_in for _ in batches]})[:, n_toks:]
+        for i in batches:
+            generated += 1
+            text = enc.decode(out[i])
+            sf.print_output(text, raw_in, f'{generated} [t:{temp}]', trunc)
 
 
 if __name__ == '__main__':
