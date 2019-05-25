@@ -131,7 +131,7 @@ def main():
 
         saver = tf.train.Saver(
             var_list=all_vars,
-            max_to_keep=5,
+            max_to_keep=2,
             keep_checkpoint_every_n_hours=2)
         sess.run(tf.global_variables_initializer())
 
@@ -143,8 +143,10 @@ def main():
                 # Get fresh GPT weights if new run.
                 ckpt = tf.train.latest_checkpoint(os.path.join('models', args.model_name))
         elif args.restore_from == 'fresh':
+            print('starting fresh')
             ckpt = tf.train.latest_checkpoint(os.path.join('models', args.model_name))
         else:
+            print(f'restore from {args.restore_from}')
             ckpt = tf.train.latest_checkpoint(args.restore_from)
         print('Loading checkpoint', ckpt)
         saver.restore(sess, ckpt)
@@ -171,19 +173,14 @@ def main():
             # Add 1 so we don't immediately try to save again
             with open(counter_path, 'r') as fp:
                 counter = int(fp.read()) + 1
+                print(f'found counter; starting at {counter}')
 
         def save():
             maketree(os.path.join(CHECKPOINT_DIR, args.run_name))
-            print(
-                'Saving',
-                os.path.join(CHECKPOINT_DIR, args.run_name,
-                             'model-{}').format(counter))
-            saver.save(
-                sess,
-                os.path.join(CHECKPOINT_DIR, args.run_name, 'model'),
-                global_step=counter)
-            with open(counter_path, 'w') as fp:
-                fp.write(str(counter) + '\n')
+            print('Saving', os.path.join(CHECKPOINT_DIR, args.run_name, 'model-{}').format(counter))
+            saver.save(sess, os.path.join(CHECKPOINT_DIR, args.run_name, 'model'), global_step=counter)
+            with open(counter_path, 'w') as lfp:
+                lfp.write(str(counter) + '\n')
 
         def generate_samples():
             print('Generating samples...')
@@ -202,9 +199,7 @@ def main():
                     index += 1
 
             maketree(os.path.join(SAMPLE_DIR, args.run_name))
-            with open(
-                    os.path.join(SAMPLE_DIR, args.run_name,
-                                 'samples-{}').format(counter), 'w') as fp:
+            with open(os.path.join(SAMPLE_DIR, args.run_name, 'samples-{}').format(counter), 'w') as fp:
                 fp.write('\n'.join(all_text))
 
         def validation():
@@ -216,12 +211,11 @@ def main():
             v_summary = sess.run(val_loss_summary, feed_dict={val_loss: v_val_loss})
             summary_log.add_summary(v_summary, counter)
             summary_log.flush()
-            print(
-                '[{counter} | {time:2.2f}] validation loss = {loss:2.2f}'
-                    .format(
-                    counter=counter,
-                    time=time.time() - start_time,
-                    loss=v_val_loss))
+            print('[{counter} | {time:2.2f}] validation loss = {loss:2.2f}'.format(
+                counter=counter,
+                time=time.time() - start_time,
+                loss=v_val_loss)
+            )
 
         def sample_batch():
             return [data_sampler.sample(1024) for _ in range(args.batch_size)]
@@ -254,13 +248,12 @@ def main():
                 avg_loss = (avg_loss[0] * 0.99 + v_loss,
                             avg_loss[1] * 0.99 + 1.0)
 
-                print(
-                    '[{counter} | {time:2.2f}] loss={loss:2.2f} avg={avg:2.2f}'
-                        .format(
-                        counter=counter,
-                        time=time.time() - start_time,
-                        loss=v_loss,
-                        avg=avg_loss[0] / avg_loss[1]))
+                print('[{counter} | {time:2.2f}] loss={loss:2.2f} avg={avg:2.2f}'.format(
+                    counter=counter,
+                    time=time.time() - start_time,
+                    loss=v_loss,
+                    avg=avg_loss[0] / avg_loss[1])
+                )
 
                 counter += 1
         except KeyboardInterrupt:
