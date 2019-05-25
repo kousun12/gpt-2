@@ -63,6 +63,16 @@ def interact_model(
         np.random.seed(seed)
         tf.set_random_seed(seed)
 
+        temp = _get_temp(temperature)
+        output = sample.sample_sequence(
+            hparams=hparams,
+            length=length,
+            context=context,
+            batch_size=batch_size,
+            temperature=temp,
+            top_k=top_k
+        )
+
         saver = tf.train.Saver()
         ckpt = tf.train.latest_checkpoint(os.path.join('models', model_name, tune_name))
         saver.restore(sess, ckpt)
