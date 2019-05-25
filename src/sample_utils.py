@@ -5,6 +5,7 @@ TITLE_T = '<|title|>'
 
 
 def title_fmt(title):
+    # format input into title; NB must match training data format!
     return f'{END_T}\n{TITLE_T}{title}{TITLE_T}\n\n\n'
 
 
@@ -23,7 +24,7 @@ def get_output(text, title=None, sample=None, trunc_first=False):
     start = _v_spacer(f"SAMPLE {str(sample)}") if sample is not None else ''
 
     if title:
-        start += f'{H_PAD}{title}\n\n\n\n'
+        start += f'{H_PAD}{title}{V_PAD * 2}'
 
     return f'{V_PAD}{start}{output_fmt(text, trunc_first)}{V_PAD}{_v_spacer("END")}{V_PAD}'
 
