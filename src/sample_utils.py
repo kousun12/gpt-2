@@ -1,3 +1,5 @@
+import re
+
 V_PAD = '\n\n'
 H_PAD = '     '
 END_T = '<|endoftext|>'
@@ -12,7 +14,7 @@ def title_fmt(title):
 def output_fmt(text, trunc_first):
     if trunc_first:
         text = text.split(END_T)[0]
-    padded = text.replace('\n', f'\n{H_PAD}')
+    padded = re.sub(r'^', H_PAD, text).replace('\n', f'\n{H_PAD}')
     return padded.replace(END_T, f"{'=' * 80}{V_PAD}").replace(TITLE_T, "") + V_PAD
 
 
@@ -21,12 +23,13 @@ def _v_spacer(text):
 
 
 def get_output(text, title=None, sample=None, trunc_first=False):
-    start = _v_spacer(f"SAMPLE {str(sample)}") if sample is not None else ''
+    num = {str(sample)}
+    start = _v_spacer(f"SAMPLE {num}") if sample is not None else ''
 
     if title:
         start += f'{H_PAD}{title}{V_PAD * 2}'
 
-    return f'{V_PAD}{start}{output_fmt(text, trunc_first)}{V_PAD}{_v_spacer("END")}{V_PAD}'
+    return f'{V_PAD}{start}{output_fmt(text, trunc_first)}{V_PAD}{_v_spacer(f"END {num}")}{V_PAD}'
 
 
 def print_output(text, title=None, sample=None, trunc_first=False):
