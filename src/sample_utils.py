@@ -23,7 +23,7 @@ def _v_spacer(text):
 
 
 def get_output(text, title=None, sample=None, trunc_first=False):
-    num = {str(sample)}
+    num = str(sample)
     start = _v_spacer(f"SAMPLE {num}") if sample is not None else ''
 
     if title:
