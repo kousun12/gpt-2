@@ -136,15 +136,14 @@ def main():
         sess.run(tf.global_variables_initializer())
 
         if args.restore_from == 'latest':
-            ckpt = tf.train.latest_checkpoint(
-                os.path.join(CHECKPOINT_DIR, args.run_name))
+            print('restoring latest')
+            ckpt = tf.train.latest_checkpoint(os.path.join(CHECKPOINT_DIR, args.run_name))
             if ckpt is None:
+                print(f'could not find latest at {os.path.join(CHECKPOINT_DIR, args.run_name)}, starting fresh')
                 # Get fresh GPT weights if new run.
-                ckpt = tf.train.latest_checkpoint(
-                    os.path.join('models', args.model_name))
+                ckpt = tf.train.latest_checkpoint(os.path.join('models', args.model_name))
         elif args.restore_from == 'fresh':
-            ckpt = tf.train.latest_checkpoint(
-                os.path.join('models', args.model_name))
+            ckpt = tf.train.latest_checkpoint(os.path.join('models', args.model_name))
         else:
             ckpt = tf.train.latest_checkpoint(args.restore_from)
         print('Loading checkpoint', ckpt)
