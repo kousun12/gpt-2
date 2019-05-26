@@ -18,7 +18,8 @@ def sample_model(
         length=None,
         temperature=1,
         top_k=0,
-        top_p=0.0
+        top_p=0.0,
+        tune_name=''
 ):
     """
     Run the sample_model
@@ -63,7 +64,7 @@ def sample_model(
         )[:, 1:]
 
         saver = tf.train.Saver()
-        ckpt = tf.train.latest_checkpoint(os.path.join('models', model_name))
+        ckpt = tf.train.latest_checkpoint(os.path.join('models', model_name, tune_name))
         saver.restore(sess, ckpt)
 
         generated = 0

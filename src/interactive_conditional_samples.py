@@ -67,7 +67,7 @@ def interact_model(
         tf.set_random_seed(seed)
 
         temp = _get_temp(temperature)
-        output = sample.sample_sequence(
+        sample.sample_sequence(
             hparams=hparams,
             length=length,
             context=context,
