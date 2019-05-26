@@ -18,6 +18,7 @@ def sample_model(
         length=None,
         temperature=1,
         top_k=0,
+        top_p=0.0
 ):
     """
     Run the sample_model
@@ -37,6 +38,8 @@ def sample_model(
      considered for each step (token), resulting in deterministic completions,
      while 40 means 40 words are considered at each step. 0 (default) is a
      special setting meaning no restrictions. 40 generally is a good value.
+    :top_p=0.0 : Float value controlling diversity. Implements nucleus sampling,
+     overriding top_k if set to a value > 0. A good setting is 0.9.
     """
     enc = encoder.get_encoder(model_name)
     hparams = model.default_hparams()
@@ -56,7 +59,7 @@ def sample_model(
             hparams=hparams, length=length,
             start_token=enc.encoder['<|endoftext|>'],
             batch_size=batch_size,
-            temperature=temperature, top_k=top_k
+            temperature=temperature, top_k=top_k, top_p=top_p
         )[:, 1:]
 
         saver = tf.train.Saver()

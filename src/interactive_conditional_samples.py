@@ -20,6 +20,7 @@ def interact_model(
         length=None,
         temperature=1,
         top_k=0,
+        top_p=0.0,
         tune_name='',
         trunc_first=False
 ):
@@ -43,6 +44,8 @@ def interact_model(
     :tune_name=None : String, subdir within the model_name dir where the fine tuned model lives,
      defaults to None, i.e. the base model
     :trunc_first=False : Boolean truncate each sample at the first end token
+    :top_p=0.0 : Float value controlling diversity. Implements nucleus sampling,
+     overriding top_k if set to a value > 0. A good setting is 0.9.
     """
     if batch_size is None:
         batch_size = 1
@@ -70,7 +73,8 @@ def interact_model(
             context=context,
             batch_size=batch_size,
             temperature=temp,
-            top_k=top_k
+            top_k=top_k,
+            top_p=top_p
         )
 
         saver = tf.train.Saver()
