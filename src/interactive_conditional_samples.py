@@ -111,7 +111,7 @@ def _get_temp(temperature):
         gauss = re.search(r'(?P<mu>\d*\.?\d*):(?P<sig>\d*\.?\d*)', str(temperature))
         mu, sig = gauss.group('mu'), gauss.group('sig') if gauss else (None, None)
         if mu and sig:
-            return random.gauss(mu, sig)
+            return random.gauss(float(mu), float(sig))
         else:
             return 1
 
